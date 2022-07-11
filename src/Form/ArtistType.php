@@ -52,7 +52,13 @@ class ArtistType extends AbstractType
                     ])
                 ]
             ])
-            ->add('genre');
+            ->add('genre', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'Genre could be empty'
+                    ])
+                ]
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

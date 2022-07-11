@@ -4,6 +4,8 @@ namespace App\Command;
 
 use App\Entity\Album;
 use App\Entity\Artist;
+use App\Repository\AlbumRepository;
+use App\Repository\ArtistRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,16 +15,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class FetchArtistsCommand extends Command
 {
     private $client;
-    private $doctrine;
+    private $artistRepository;
+    private $albumRepository;
 
-    public function __construct(HttpClientInterface $client, ManagerRegistry $doctrine)
+    public function __construct(HttpClientInterface $client, ArtistRepository $artistRepository, AlbumRepository $albumRepository)
     {
         $this->client = $client;
-        $this->doctrine = $doctrine;
+        $this->artistRepository = $artistRepository;
+        $this->albumRepository = $albumRepository;
 
         parent::__construct();
     }
@@ -44,104 +49,116 @@ class FetchArtistsCommand extends Command
 
         $searchParam = $input->getArgument('searchParam');
 
-        // $io->success($searchParam);
-
-        // $io->error('Marko je car');
-        // dd($_ENV['SPOTIFY_API_KEY']);
-        // dd(env('SPOTIFY_API_KEY'));
-
-
         try {
-            $response = $this->client->request(
-                'GET',
-                'https://api.spotify.com/v1/search',
-                [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . $_ENV['SPOTIFY_API_KEY'],
-                    ],
-                    'query' => [
-                        'q' => $searchParam,
-                        'type' => 'artist',
-                        'offset' => 0,
-                        'limit' => 20,
-                    ]
-                ]
-            );
+            $content = json_decode($this->searchArtists($searchParam));
 
-            $content = $response->getContent();
-
-            $content = json_decode($content);
-
-            $entityManager = $this->doctrine->getManager();
+            $progressBar = new ProgressBar($output, count($content->artists->items));
+            $progressBar->start();
 
             foreach ($content->artists->items as $key => $spotifyArtist) {
-                $artist = new Artist();
-                $artist->setFollowers($spotifyArtist->followers->total);
-                $artist->setSpotifyArtistId($spotifyArtist->id);
 
-                if (count($spotifyArtist->images) == 0) {
-                    $artist->setImageLink('https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_CMYK_Green.png');
-                } else {
-                    $artist->setImageLink($spotifyArtist->images[0]->url);
-                }
-                $artist->setName($spotifyArtist->name);
-                $artist->setPopularity($spotifyArtist->popularity);
+                $artist = $this->makeArtist($spotifyArtist);
 
-                $genresString = "";
-                foreach ($spotifyArtist->genres as $genre) {
-                    $genresString .= $genre . ',';
-                }
-                $artist->setGenre($genresString);
+                $contentAlbums = json_decode($this->searchAlbums($spotifyArtist));
+
+                $contentAlbums = ($contentAlbums);
+
+                $this->artistRepository->add($artist, true);
 
 
-
-                $responseAlbums = $this->client->request(
-                    'GET',
-                    'https://api.spotify.com/v1/artists/' . $spotifyArtist->id . '/albums',
-                    [
-                        'headers' => [
-                            'Content-Type' => 'application/json',
-                            'Authorization' => 'Bearer ' . $_ENV['SPOTIFY_API_KEY'],
-                        ],
-                        'query' => [
-                            'offset' => 0,
-                            'limit' => 20,
-                        ]
-
-                    ]
-                );
-
-
-
-                $contentAlbums = $responseAlbums->getContent();
-
-                $contentAlbums = json_decode($contentAlbums);
-
-                $entityManager->persist($artist);
-                $entityManager->flush();
 
                 foreach ($contentAlbums->items as $key => $spotifyAlbum) {
-                    $album = new Album();
-                    $album->setSpotifyAlbumId($spotifyAlbum->id);;
-                    $album->setName($spotifyAlbum->name);
-                    $album->setReleaseDate($spotifyAlbum->release_date);
-                    $album->setTotalTracks($spotifyAlbum->total_tracks);
-                    $album->setArtist($artist);
+                    $album = $this->makeAlbum($spotifyAlbum, $artist);
 
-                    $entityManager->persist($album);
-                    $entityManager->flush();
+                    $this->albumRepository->add($album, true);
                 }
+                $progressBar->advance();
             }
         } catch (Exception $ex) {
             $io->error($ex->getMessage());
             return Command::FAILURE;
         }
 
-
-
         $io->success('Sucessfully saved to database');
 
         return Command::SUCCESS;
+    }
+
+    private function searchArtists($searchParam)
+    {
+        $response = $this->client->request(
+            'GET',
+            'https://api.spotify.com/v1/search',
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $_ENV['SPOTIFY_API_KEY'],
+                ],
+                'query' => [
+                    'q' => $searchParam,
+                    'type' => 'artist',
+                    'offset' => 0,
+                    'limit' => 20,
+                ]
+            ]
+        );
+
+        return $response->getContent();
+    }
+
+    private function searchAlbums($spotifyArtist)
+    {
+        $responseAlbums = $this->client->request(
+            'GET',
+            'https://api.spotify.com/v1/artists/' . $spotifyArtist->id . '/albums',
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $_ENV['SPOTIFY_API_KEY'],
+                ],
+                'query' => [
+                    'offset' => 0,
+                    'limit' => 20,
+                ]
+
+            ]
+        );
+
+        return $responseAlbums->getContent();
+    }
+
+    private function makeArtist($spotifyArtist)
+    {
+        $artist = new Artist();
+        $artist->setFollowers($spotifyArtist->followers->total);
+        $artist->setSpotifyArtistId($spotifyArtist->id);
+
+        if (count($spotifyArtist->images) == 0) {
+            $artist->setImageLink('https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_CMYK_Green.png');
+        } else {
+            $artist->setImageLink($spotifyArtist->images[0]->url);
+        }
+        $artist->setName($spotifyArtist->name);
+        $artist->setPopularity($spotifyArtist->popularity);
+
+        $genresString = "";
+        foreach ($spotifyArtist->genres as $genre) {
+            $genresString .= $genre . ',';
+        }
+        $artist->setGenre($genresString);
+
+        return $artist;
+    }
+
+    private function makeAlbum($spotifyAlbum, $artist)
+    {
+        $album = new Album();
+        $album->setSpotifyAlbumId($spotifyAlbum->id);;
+        $album->setName($spotifyAlbum->name);
+        $album->setReleaseDate($spotifyAlbum->release_date);
+        $album->setTotalTracks($spotifyAlbum->total_tracks);
+        $album->setArtist($artist);
+
+        return $album;
     }
 }

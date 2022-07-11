@@ -42,6 +42,7 @@ class AdminArtistController extends AbstractController
     public function new(Request $request, ArtistRepository $artistRepository): Response
     {
         $artist = new Artist();
+
         $form = $this->createForm(ArtistType::class, $artist);
         $form->handleRequest($request);
 

@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -11,18 +12,19 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserFicture extends Fixture
 {
     protected $faker;
+    protected $userRepository;
     protected $userPasswordHasher;
 
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher, UserRepository $userRepository)
     {
         $this->faker = Factory::create();
         $this->userPasswordHasher = $userPasswordHasher;
+        $this->userRepository = $userRepository;
     }
     public function load(ObjectManager $manager): void
     {
 
-        // $product = new Product();
-        // $manager->persist($product);
+        // creating admin user
         $adminUser = new User();
         $adminUser->setEmail('markostevic96@hotmail.com');
         $adminUser->setRoles(['ROLE_ADMIN']);
@@ -35,8 +37,7 @@ class UserFicture extends Fixture
         $adminUser->setFirstName('Marko');
         $adminUser->setLastName('Stevic');
 
-        $manager->persist($adminUser);
-        $manager->flush();
+        $this->userRepository->add($adminUser, true);
 
         for ($i = 0; $i < 30; $i++) {
             $user = new User();
@@ -51,8 +52,7 @@ class UserFicture extends Fixture
             $user->setFirstName($this->faker->firstName);
             $user->setLastName($this->faker->lastName);
 
-            $manager->persist($user);
-            $manager->flush();
+            $this->userRepository->add($user, true);
         }
     }
 }

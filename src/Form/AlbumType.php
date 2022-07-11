@@ -59,7 +59,12 @@ class AlbumType extends AbstractType
                 ],
                 'choice_label' => function (?Artist $artist) {
                     return $artist ? strtoupper($artist->getName()) : '';
-                }
+                },
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Artist field cannot be null'
+                    ])
+                ]
             ]);
     }
 

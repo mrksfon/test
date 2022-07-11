@@ -44,6 +44,7 @@ class AdminAlbumController extends AbstractController
     {
         $album = new Album();
         $artists = $artistRepository->findAll();
+
         $form = $this->createForm(AlbumType::class, $album, [
             'artists' => $artists
         ]);
