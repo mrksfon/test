@@ -41,7 +41,7 @@ class UserFicture extends Fixture
         for ($i = 0; $i < 30; $i++) {
             $user = new User();
             $user->setEmail($this->faker->email);
-            $user->setRoles([]);
+            $user->setRoles(['ROLE_USER']);
             $user->setPassword(
                 $this->userPasswordHasher->hashPassword(
                     $adminUser,

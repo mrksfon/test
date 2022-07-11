@@ -16,9 +16,6 @@ class LoginController extends AbstractController
      */
     public function index(ManagerRegistry $doctrine, AuthenticationUtils $authenticationUtils): Response
     {
-        $user = $doctrine->getRepository(User::class)->find(4);
-
-        dd($user->getRoles());
         $error = $authenticationUtils->getLastAuthenticationError();
 
         $lastUsername = $authenticationUtils->getLastUsername();
