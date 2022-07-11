@@ -39,20 +39,18 @@ class FavoriteRepository extends ServiceEntityRepository
         }
     }
 
-    //    /**
-    //     * @return Favorite[] Returns an array of Favorite objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Favorite[] Returns an array of Favorite objects
+     */
+    public function findByUserId($value): array
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.user = :val')
+            ->setParameter('val', $value)
+            ->orderBy('f.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
     public function findOneByUserAndAlbumId($userId, $albumId): ?Favorite
     {

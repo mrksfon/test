@@ -17,7 +17,7 @@ class FavoriteController extends AbstractController
      */
     public function index(FavoriteRepository $favoriteRepository): Response
     {
-        $favorites = $favoriteRepository->findAll();
+        $favorites = $favoriteRepository->findByUserId($this->getUser()->getId());
         return $this->render('favorite/index.html.twig', [
             'favorites' => $favorites
         ]);
@@ -47,7 +47,6 @@ class FavoriteController extends AbstractController
      */
     public function unfavorite(Favorite $favorite, FavoriteRepository $favoriteRepository): Response
     {
-
         $favoriteRepository->remove($favorite, true);
 
         return $this->redirectToRoute('app_favorite');
