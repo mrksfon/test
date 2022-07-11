@@ -6,14 +6,24 @@
     <h1>Register</h1>
 
     {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.first_name) }}
-        {{ form_row(registrationForm.last_name) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
+        <div class="mb-3">
+            {{ form_row(registrationForm.email,{'attr': {'class': 'form-control'}}) }}
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+            {{ form_row(registrationForm.first_name,{'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(registrationForm.last_name,{'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(registrationForm.plainPassword, {
+            label: 'Password',
+            'attr': {'class' : 'form-control'}
         }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+        </div>
+        
 
-        <button type="submit" class="btn">Register</button>
+        <button type="submit" class="btn btn-primary">Register</button>
     {{ form_end(registrationForm) }}
 {% endblock %}

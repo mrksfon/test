@@ -31,14 +31,6 @@ class RegistrationFormType extends AbstractType
                         'max' => 255,
                         'maxMessage' => 'Email could not be longer than 255 characters'
                     ])
-                ]
-            ])
-            ->add('agreeTerms', CheckboxType::class, [
-                'mapped' => false,
-                'constraints' => [
-                    new IsTrue([
-                        'message' => 'You should agree to our terms.',
-                    ]),
                 ],
             ])
             ->add('first_name', TextType::class, [

@@ -4,31 +4,29 @@
 
 {% block body %}
     <h1>Album index</h1>
-
+    <a href="{{ path('app_admin_album_new') }}" class="btn btn-primary">Create new</a>
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Spotify_album_id</th>
-                <th>Name</th>
+                <th>{{ knp_pagination_sortable(pagination, 'Id', 'a.id') }}</th>
+                <th>{{ knp_pagination_sortable(pagination, 'Name', 'a.name') }}</th>
                 <th>Release_date</th>
-                <th>Total_tracks</th>
+                <th>{{ knp_pagination_sortable(pagination, 'Total tracks', 'a.total_tracks') }}</th>
                 <th>Artist</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for album in albums %}
+        {% for album in pagination %}
             <tr>
                 <td>{{ album.id }}</td>
-                <td>{{ album.spotifyAlbumId }}</td>
                 <td>{{ album.name }}</td>
                 <td>{{ album.releaseDate }}</td>
                 <td>{{ album.totalTracks }}</td>
                 <td>{{ album.artist.name }}</td>
                 <td>
-                    <a href="{{ path('app_admin_album_show', {'id': album.id}) }}">show</a>
-                    <a href="{{ path('app_admin_album_edit', {'id': album.id}) }}">edit</a>
+                    <a href="{{ path('app_admin_album_show', {'id': album.id}) }}" class="btn btn-success">show</a>
+                    <a href="{{ path('app_admin_album_edit', {'id': album.id}) }}" class="btn btn-primary">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -38,6 +36,7 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_admin_album_new') }}">Create new</a>
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
 {% endblock %}

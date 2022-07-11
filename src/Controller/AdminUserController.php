@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * @Route("/admin/user")
@@ -18,10 +20,18 @@ class AdminUserController extends AbstractController
     /**
      * @Route("/", name="app_admin_user_index", methods={"GET"})
      */
-    public function index(UserRepository $userRepository): Response
+    public function index(EntityManagerInterface $entityManager, PaginatorInterface $paginator, Request $request): Response
     {
+        $dql = 'SELECT u FROM App\Entity\User u';
+        $query = $entityManager->createQuery($dql);
+
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            10 /*limit per page*/
+        );
         return $this->render('admin_user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'pagination' => $pagination
         ]);
     }
 
@@ -81,7 +91,7 @@ class AdminUserController extends AbstractController
      */
     public function delete(Request $request, User $user, UserRepository $userRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
             $userRepository->remove($user, true);
         }
 
