@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Artist index{% endblock %}
+
+{% block body %}
+    <h1>Artist index</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>{{ knp_pagination_sortable(pagination, 'Id', 'a.id') }}</th>
+                <th>{{ knp_pagination_sortable(pagination, 'Followers', 'a.followers') }}</th>
+                <th>{{ knp_pagination_sortable(pagination, 'Name', 'a.name') }}</th>
+                <th>{{ knp_pagination_sortable(pagination, 'Popularity', 'a.popularity') }}</th>
+                <th>Album</th>
+                <th>Genre</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for artist in pagination %}
+            <tr>
+                <td>{{ artist.id }}</td>
+                <td>{{ artist.followers }}</td>
+                <td>{{ artist.name }}</td>
+                <td>{{ artist.popularity }}</td>
+                <td><a href="{{ path('app_artist_show', {'id': artist.id}) }}">Albums</a></td>
+                <td>{{ artist.genre }}</td>
+                <td>
+                    <a href="{{ path('app_artist_show', {'id': artist.id}) }}" class="btn btn-success">show</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+<div class="navigation">
+    {{ knp_pagination_render(pagination) }}
+</div>
+{% endblock %}

@@ -39,7 +39,7 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/user, roles: ROLE_USER }
         - { path: /logout, roles: [ROLE_USER,ROLE_ADMIN] }
-        - { path: /test, roles: ROLE_USER }
+        - { path: /dashboard, roles: [ROLE_USER,ROLE_ADMIN] }
 when@test:
     security:
         password_hashers:

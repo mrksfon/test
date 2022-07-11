@@ -45,7 +45,7 @@ class AlbumType extends AbstractType
                     ])
                 ]
             ])
-            ->add('release_date')
+            ->add('release_date', TextType::class)
             ->add('total_tracks', IntegerType::class, [
                 'constraints' => [
                     new Positive([
