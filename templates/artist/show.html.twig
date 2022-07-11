@@ -42,6 +42,9 @@
                     <div class="col-sm-3">
                         <p class="mb-0">Total tracks</p>
                     </div>
+                    <div class="col-sm-3">
+                        <p class="mb-0">Favorite</p>
+                    </div>
                 </div>
                 <hr>
             {% for album in artist.albums %}
@@ -54,6 +57,9 @@
                     </div>
                     <div class="col-sm-3">
                         <p class="mb-0">{{album.totalTracks}}</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <a href="{{ path('app_favorite_album', {'id': album.id}) }}" class="btn btn-primary">Favorite</a>
                     </div>
                 </div>
                 <hr>

@@ -28,11 +28,9 @@
                         <a class="nav-link active" aria-current="page" href="{{ path('app_artist') }}">Artists</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ path('app_admin_artist_index') }}">Artists</a>
+                        <a class="nav-link active" aria-current="page" href="{{ path('app_favorite') }}">Favorites</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ path('app_admin_album_index') }}">Albums</a>
-                    </li>
+                    
                 {% endif %}
             </ul>
             {% if app.user %}

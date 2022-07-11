@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\AlbumRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 
 /**
  * @ORM\Entity(repositoryClass=AlbumRepository::class)
@@ -43,6 +45,15 @@ class Album
      */
     private $artist;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Favorite::class, mappedBy="album", orphanRemoval=true)
+     */
+    private $favorite;
+
+    public function __construct()
+    {
+        $this->favorite = new ArrayCollection();
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +115,36 @@ class Album
     public function setArtist(?Artist $artist): self
     {
         $this->artist = $artist;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Favorite>
+     */
+    public function getFavorite(): Collection
+    {
+        return $this->favorite;
+    }
+
+    public function addFavorite(Favorite $favorite): self
+    {
+        if (!$this->favorite->contains($favorite)) {
+            $this->favorite[] = $favorite;
+            $favorite->setAlbum($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavorite(Favorite $favorite): self
+    {
+        if ($this->favorite->removeElement($favorite)) {
+            // set the owning side to null (unless already changed)
+            if ($favorite->getAlbum() === $this) {
+                $favorite->setAlbum(null);
+            }
+        }
 
         return $this;
     }

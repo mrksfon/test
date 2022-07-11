@@ -13,7 +13,7 @@ use Knp\Component\Pager\PaginatorInterface;
 class ArtistController extends AbstractController
 {
     /**
-     * @Route("/artist", name="app_artist")
+     * @Route("/user/artist", name="app_artist")
      */
     public function index(EntityManagerInterface $entityManager, PaginatorInterface $paginator, Request $request): Response
     {
@@ -32,7 +32,7 @@ class ArtistController extends AbstractController
     }
 
     /**
-     * @Route("/artist/{id}", name="app_artist_show", methods={"GET"})
+     * @Route("/user/artist/{id}", name="app_artist_show", methods={"GET"})
      */
     public function show(Artist $artist): Response
     {

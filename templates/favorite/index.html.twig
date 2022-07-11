@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Artist index{% endblock %}
+
+{% block body %}
+    <section style="background-color: #eee;">
+  <div class="container py-5">
+
+    <div class="row">
+        <div class="card mb-4">
+          <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p class="mb-0">Artist Name</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <p class="mb-0">Album name</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <p class="mb-0">Release Date</p>
+                    </div>
+                    <div class="col-sm-3">
+                        {# <p class="mb-0">Total tracks</p> #}
+                    </div>
+                </div>
+                <hr>
+            {% for favorite in favorites %}
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p class="mb-0">{{favorite.album.artist.name}}</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <p class="mb-0">{{favorite.album.name}}</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <p class="mb-0">{{favorite.album.releaseDate}}</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <a href="{{ path('app_unfavorite_album', {'id': favorite.id}) }}" class="btn btn-primary">UnFavorite</a>
+                    </div>
+                </div>
+                <hr>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+{% endblock %}
+
+
+            
