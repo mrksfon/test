@@ -16,6 +16,10 @@ class LoginController extends AbstractController
      */
     public function index(ManagerRegistry $doctrine, AuthenticationUtils $authenticationUtils): Response
     {
+        $user = $this->getUser();
+        if ($user != null) {
+            return $this->redirect('/dashboard');
+        }
         $error = $authenticationUtils->getLastAuthenticationError();
 
         $lastUsername = $authenticationUtils->getLastUsername();
